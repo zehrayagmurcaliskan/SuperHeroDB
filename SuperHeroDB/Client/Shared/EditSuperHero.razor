@@ -1,0 +1,46 @@
+﻿@inject ISuperHeroService SuperHeroService
+@inject IJSRuntime JSRunTime
+
+<h3>EditSuperHero</h3>
+
+<EditForm Model="Hero" OnSubmit="HandleSubmit">
+    <InputText @bind-Value="Hero.FirstName" class="form-control" placeholder="First Name"> </InputText>
+    <br />
+    <InputText @bind-Value="Hero.LastName" class="form-control" placeholder="Last Name"> </InputText>
+    <br />
+    <InputText @bind-Value="Hero.HeroName" class="form-control" placeholder="Hero Name"> </InputText>
+    <br />
+
+    <div class="form-group">
+       <label>Comic</label> <br />
+        <InputRadioGroup @bind-Value="comicId" class="form-control">
+            @foreach (var comic in SuperHeroService.Comics)
+            {
+                <InputRadio Value="@comic.Id"/><span style="padding-left :5px;">@comic.Name</span><br />
+            }
+        </InputRadioGroup>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
+@code {
+    public SuperHeroDB.Shared.SuperHero Hero { get; set; } = new SuperHeroDB.Shared.SuperHero();
+    int comicId = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+       // await SuperHeroService.GetComics();
+
+    }
+
+    void HandleSubmit()
+    {
+        Hero.Comic = SuperHeroService.Comics.FirstOrDefault(c=>c.Id==comicId);
+        Console.WriteLine("HandleSubmit was called!");
+        JSRunTime.InvokeVoidAsync("console.log",Hero);
+    }
+
+    List<Comic> Comics { get; set; } = new List<Comic>() { new Comic { Id=1,Name="Bruce"}, new Comic { Id = 2, Name = "Will" } };
+
+}
