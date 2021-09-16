@@ -18,12 +18,24 @@ namespace SuperHeroDB.Client.Services
         }
 
         public List<Comic> Comics { get; set; } = new List<Comic>();
+        public List<SuperHero> Heroes { get; set; } = new List<SuperHero>();
 
-        public async Task<List<SuperHero>> CreateSuperHeroes(SuperHero hero)
+        public event Action OnChange;
+
+        public async Task<List<SuperHero>> CreateSuperHero(SuperHero hero)
         {
             var result = await _httpClient.PostAsJsonAsync<SuperHero>($"api/superhero",hero);
-            var heroes = await result.Content.ReadFromJsonAsync<List<SuperHero>>();
-            return heroes; 
+            Heroes = await result.Content.ReadFromJsonAsync<List<SuperHero>>();
+            OnChange.Invoke();
+            return Heroes; 
+        }
+
+        public async Task<List<SuperHero>> DeleteSuperHero(int id)
+        {
+            var result = await _httpClient.DeleteAsync($"api/superhero/{id}");
+            Heroes = await result.Content.ReadFromJsonAsync<List<SuperHero>>();
+            OnChange.Invoke();
+            return Heroes;
         }
 
         public async Task GetComics()
@@ -39,7 +51,16 @@ namespace SuperHeroDB.Client.Services
 
         public async Task<List<SuperHero>> GetSuperHeroes()
         {
-            return await _httpClient.GetFromJsonAsync<List<SuperHero>>("api/superhero");
+           Heroes= await _httpClient.GetFromJsonAsync<List<SuperHero>>("api/superhero");
+            return Heroes;
+        }
+
+        public async Task<List<SuperHero>> UpdateSuperHero(SuperHero hero, int id)
+        {
+            var result = await _httpClient.PutAsJsonAsync<SuperHero>($"api/superhero/{id}", hero);
+            Heroes = await result.Content.ReadFromJsonAsync<List<SuperHero>>();
+            OnChange.Invoke();
+            return Heroes;
         }
     }
 }

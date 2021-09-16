@@ -8,7 +8,11 @@ namespace SuperHeroDB.Client.Services
 {
     public interface ISuperHeroService
     {
-         List<Comic> Comics  { get; set; } 
+        event Action OnChange;
+         List<Comic> Comics  { get; set; }
+
+        List<SuperHero> Heroes { get; set; }
+
 
         Task<List<SuperHero>> GetSuperHeroes();
 
@@ -16,7 +20,10 @@ namespace SuperHeroDB.Client.Services
 
         Task<SuperHero> GetSuperHero(int id);
 
-        Task<List<SuperHero>> CreateSuperHeroes(SuperHero hero); 
+        Task<List<SuperHero>> CreateSuperHero(SuperHero hero);
+        Task<List<SuperHero>> UpdateSuperHero(SuperHero hero, int id);
+
+        Task<List<SuperHero>> DeleteSuperHero(int id);
 
     }
 }

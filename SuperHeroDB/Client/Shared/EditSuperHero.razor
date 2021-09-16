@@ -1,7 +1,12 @@
 ﻿@inject ISuperHeroService SuperHeroService
 @inject IJSRuntime JSRunTime
-
-<h3>EditSuperHero</h3>
+@if (Hero.Id == 0){
+<h3> Create a new hero</h3>;
+}
+else
+{
+<h3> Edit "@Hero.HeroName"</h3>;
+}
 
 <EditForm Model="Hero" OnSubmit="HandleSubmit">
     <InputText @bind-Value="Hero.FirstName" class="form-control" placeholder="First Name"> </InputText>
@@ -25,22 +30,34 @@
 </EditForm>
 
 @code {
-    public SuperHeroDB.Shared.SuperHero Hero { get; set; } = new SuperHeroDB.Shared.SuperHero();
-    int comicId = 1;
 
-    protected override async Task OnInitializedAsync()
+        // [Parameter]
+        //public SuperHeroDB.Shared.SuperHero heroToEdit { get; set; }
+
+        [Parameter]
+        public SuperHeroDB.Shared.SuperHero Hero { get; set; } = new SuperHeroDB.Shared.SuperHero();
+        int comicId = 1;
+
+        protected override async Task OnParametersSetAsync()
     {
-       // await SuperHeroService.GetComics();
+
+        await SuperHeroService.GetComics();
+        comicId = Hero.Comic.Id;
 
     }
 
-    void HandleSubmit()
+    async void HandleSubmit()
     {
         Hero.Comic = SuperHeroService.Comics.FirstOrDefault(c=>c.Id==comicId);
-        Console.WriteLine("HandleSubmit was called!");
-        JSRunTime.InvokeVoidAsync("console.log",Hero);
+
+        await JSRunTime.InvokeVoidAsync("console.log", Hero);
+
+        if (Hero.Id==0)
+            await SuperHeroService.CreateSuperHero(Hero);
+        else
+            await SuperHeroService.UpdateSuperHero(Hero, Hero.Id);
+
     }
 
-    List<Comic> Comics { get; set; } = new List<Comic>() { new Comic { Id=1,Name="Bruce"}, new Comic { Id = 2, Name = "Will" } };
 
 }
