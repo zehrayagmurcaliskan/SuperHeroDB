@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SuperHeroDB.Server.Data;
 using SuperHeroDB.Shared;
 using System;
 using System.Collections.Generic;
@@ -23,24 +25,31 @@ namespace SuperHeroDB.Server.Controllers
             new SuperHero{Id=1,FirstName="Peter",LastName="Parker",HeroName="Spiderman",Comic=comics[0]},
             new SuperHero{Id=2,FirstName="Bruce",LastName="Wayne",HeroName="Batman",Comic=comics[1]}
         };
+        private readonly DataContext _context;
+
+        public SuperHeroController(DataContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet("comics")]
         public async Task<IActionResult> GetComics()
         {
-            return Ok(comics);
+            return Ok(await _context.Comics.ToListAsync());
+
         }
-
-
         [HttpGet]
         public async Task<IActionResult> GetSuperHeroes()
         {
-            return Ok(heroes);
+            return Ok(await _context.SuperHeroes.Include(sh=>sh.Comic).ToListAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSingleSuperHero(int id)
         {
-            var hero = heroes.FirstOrDefault(h => h.Id == id);
+            var hero = await _context.SuperHeroes
+                .Include(sh => sh.Comic)
+                .FirstOrDefaultAsync(h => h.Id == id);
             if (hero==null)
               return NotFound("Super Hero wasn't found.Too bad.");
                 

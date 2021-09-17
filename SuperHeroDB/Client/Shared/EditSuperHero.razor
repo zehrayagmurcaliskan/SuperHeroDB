@@ -31,17 +31,19 @@ else
 
 @code {
 
-        // [Parameter]
-        //public SuperHeroDB.Shared.SuperHero heroToEdit { get; set; }
+    // [Parameter]
+    //public SuperHeroDB.Shared.SuperHero heroToEdit { get; set; }
 
-        [Parameter]
-        public SuperHeroDB.Shared.SuperHero Hero { get; set; } = new SuperHeroDB.Shared.SuperHero();
-        int comicId = 1;
+    [Parameter]
+    public SuperHeroDB.Shared.SuperHero Hero { get; set; } = new SuperHeroDB.Shared.SuperHero();
+    int comicId = 1;
 
-        protected override async Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
 
+
         await SuperHeroService.GetComics();
+        Hero.Comic = new Comic();
         comicId = Hero.Comic.Id;
 
     }

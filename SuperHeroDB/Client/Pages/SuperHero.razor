@@ -3,18 +3,18 @@
 
 <h3>SuperHero</h3>
 @if (hero== null)
-            {
-                <span> Hero is loading...</span>
+{
+    <span> Hero is loading...</span>
 }
 else
 {
-    <h3>This is @hero.HeroName, also called @hero.FirstName, @hero.LastName </h3>
+    <h3>This is @hero.HeroName, also called @hero.FirstName, @hero.LastName. </h3>
     <span> This hero belongs to @hero.Comic.Name. </span>
 }
 @code {
     [Parameter]
     public int Id { get; set; }
-    SuperHeroDB.Shared.SuperHero hero = new SuperHeroDB.Shared.SuperHero();
+    SuperHeroDB.Shared.SuperHero hero;
 
     protected override async Task OnInitializedAsync()
     {
