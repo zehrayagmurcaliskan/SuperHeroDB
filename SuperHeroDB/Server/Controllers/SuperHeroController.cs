@@ -41,7 +41,12 @@ namespace SuperHeroDB.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetSuperHeroes()
         {
-            return Ok(await _context.SuperHeroes.Include(sh=>sh.Comic).ToListAsync());
+            return base.Ok(await GetDbHeroes());
+        }
+
+        private async Task<List<SuperHero>> GetDbHeroes()
+        {
+            return await _context.SuperHeroes.Include(sh => sh.Comic).ToListAsync();
         }
 
         [HttpGet("{id}")]
@@ -60,34 +65,45 @@ namespace SuperHeroDB.Server.Controllers
 
         public async Task<IActionResult> CreateSuperHero(SuperHero hero)
         {
-            hero.Id = heroes.Max(h => h.Id + 1);
-            heroes.Add(hero);
-            return Ok(heroes);
+
+            _context.SuperHeroes.Add(hero);
+            await _context.SaveChangesAsync();
+            return Ok(await GetDbHeroes());
 
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCreateSuperHero(SuperHero hero, int id)
         {
-            var dbHero = heroes.FirstOrDefault(h => h.Id == id);
+            var dbHero = await _context.SuperHeroes
+                .Include(sh => sh.Comic)
+                .FirstOrDefaultAsync(h => h.Id == id);
             if (dbHero == null)
                 return NotFound("Super Hero wasn't found.Too bad.");
-            var index = heroes.IndexOf(dbHero);
-            heroes[index] = hero;
-            
-            return Ok(heroes);
+
+            dbHero.FirstName = hero.FirstName;
+            dbHero.LastName = hero.LastName;
+            dbHero.HeroName = hero.HeroName;
+            dbHero.ComicId = hero.ComicId;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(await GetDbHeroes());
 
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCreateSuperHero(int id)
         {
-            var dbHero = heroes.FirstOrDefault(h => h.Id == id);
+            var dbHero = await _context.SuperHeroes
+                .Include(sh => sh.Comic)
+                .FirstOrDefaultAsync(h => h.Id == id);
             if (dbHero == null)
                 return NotFound("Super Hero wasn't found.Too bad.");
             
-            heroes.Remove(dbHero);
+            _context.SuperHeroes.Remove(dbHero);
+            await _context.SaveChangesAsync();
 
-            return Ok(heroes);
+            return Ok(await GetDbHeroes());
 
         }
     }

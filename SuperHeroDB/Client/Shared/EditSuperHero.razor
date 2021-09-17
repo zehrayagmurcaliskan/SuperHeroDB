@@ -43,14 +43,15 @@ else
 
 
         await SuperHeroService.GetComics();
-        Hero.Comic = new Comic();
-        comicId = Hero.Comic.Id;
+        
+        comicId = Hero.ComicId;
 
     }
 
     async void HandleSubmit()
     {
-        Hero.Comic = SuperHeroService.Comics.FirstOrDefault(c=>c.Id==comicId);
+        Hero.Comic = null;
+        Hero.ComicId = comicId;
 
         await JSRunTime.InvokeVoidAsync("console.log", Hero);
 
